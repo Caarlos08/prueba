@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Ruedas-Talladora</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+    }
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    img {
+      display: block;
+      margin: 10px auto;
+      max-width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      text-align: center;
+      padding: 10px;
+    }
+
+    #resultado-formula{
+      font-size: 20px;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .hidden {
+      display: none;
+    }
+    
+    .formula {
+        font-size: 25px;
+      }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 10px;
+      }
+      form {
+        padding: 15px;
+      }
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Ruedas-Talladora</h1>
+  <h2 style="color: rgb(5, 26, 189); text-align: center;">TALLERES TORRALVO</h2>
+  <form id="formulario-calculadora">
+    <label for="angulo">Ángulo: </label>
+    <input type="number" id="angulo" step="0.000001" required><br>
+
+    <label for="m">M (módulo): </label>
+    <input type="number" id="m" step="0.000001" required><br>
+
+    <label for="n">N (nº entradas de fresa madre): </label>
+    <input type="number" id="n" step="1" required><br>
+
+    <label for="k">K (constante): </label>
+    <select id="k" required>
+      <option value="6.36619">6.36619</option>
+      <option value="7.9577">7.9577</option>
+    </select><br>
+
+    <button type="button" id="boton-calcular">Calcular</button>
+    <span class="formula">A&#215;C&nbsp;&nbsp;&nbsp;Ruedas conductoras</span><br>
+    <span class="formula">&#8212&#8212</span><br>
+    <span class="formula">B&#215;D&nbsp;&nbsp;&nbsp;Ruedas conducidas</span>
+  </form>
+
+  <p id="resultado-formula" class="hidden">Resultado de la operación: <span id="valor-resultado"></span></p>
+
+  <table id="tabla-resultados" class="hidden">
+    <thead>
+      <tr>
+        <th>RELACIÓN</th>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+        <th>D</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const valores = [25, 30, 35, 40, 45, 50, 55, 60, 70, 75, 80, 85, 90, 95, 100, 110, 120];
+    const tabla = document.getElementById('tabla-resultados');
+    const cuerpoTabla = tabla.querySelector('tbody');
+    const resultadoFormulaElemento = document.getElementById('resultado-formula');
+    const valorResultadoElemento = document.getElementById('valor-resultado');
+
+    document.getElementById('boton-calcular').addEventListener('click', () => {
+      const angulo = parseFloat(document.getElementById('angulo').value);
+      const m = parseFloat(document.getElementById('m').value);
+      const n = parseInt(document.getElementById('n').value);
+      const k = parseFloat(document.getElementById('k').value);
+
+      if (isNaN(angulo) || isNaN(m) || isNaN(n) || isNaN(k)) {
+        alert('Por favor, introduce todos los valores correctamente.');
+        return;
+      }
+
+      const resultadoFormula = parseFloat(((k * Math.sin(angulo * Math.PI / 180)) / (m * n)).toFixed(7));
+      valorResultadoElemento.textContent = resultadoFormula;
+      resultadoFormulaElemento.classList.remove('hidden');
+
+      const resultados = [];
+
+      // Usando A, B, C, D con la fórmula (A * C) / (B * D)
+      valores.forEach(a => {
+        valores.forEach(b => {
+          if (b === a) return;
+          valores.forEach(c => {
+            if (c === a || c === b) return;
+            valores.forEach(d => {
+              if (d === a || d === b || d === c) return;
+              const relacion = parseFloat((a * c / (b * d)).toFixed(7));
+              resultados.push({ relacion, a, b, c, d });
+            });
+          });
+        });
+      });
+
+      // Usando solo A y B
+      valores.forEach(a => {
+        valores.forEach(b => {
+          if (b === a) return;
+          const relacion = parseFloat((a / b).toFixed(6));
+          resultados.push({ relacion, a, b, c: '-', d: '-' });
+        });
+      });
+
+      const resultadosCercanos = resultados
+        .sort((x, y) => Math.abs(x.relacion - resultadoFormula) - Math.abs(y.relacion - resultadoFormula))
+        .slice(0, 10);
+
+      cuerpoTabla.innerHTML = '';
+      resultadosCercanos.forEach(({ relacion, a, b, c, d }) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${relacion}</td>
+          <td>${a}</td>
+          <td>${b}</td>
+          <td>${c}</td>
+          <td>${d}</td>
+        `;
+        cuerpoTabla.appendChild(fila);
+      });
+
+      tabla.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
