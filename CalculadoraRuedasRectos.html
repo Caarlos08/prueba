@@ -171,6 +171,22 @@
         return frac1.numerador * frac2.denominador === frac1.denominador * frac2.numerador;
       }
 
+            // Segunda búsqueda (solo A y B de valores1)
+      if (resultados.length === 0) {
+        for (let a of valores1) {
+          for (let b of valores1) {
+            if (a !== b) {
+              const frac1 = { numerador: 30, denominador: Z };
+              const frac2 = { numerador: a, denominador: b };
+
+              if (fraccionIgual(frac1, frac2)) {
+                resultados.push({ a, b, c: null, d: null, tipo: "AB" });
+              }
+            }
+          }
+        }
+      }
+
       // Primera búsqueda (cuatro valores de valores1)
       for (let a of valores1) {
         for (let b of valores1) {
@@ -191,22 +207,6 @@
 
               if (fraccionIgual(frac1, frac2)) {
                 resultados.push({ a, b, c, d, tipo: "ABCD-1" });
-              }
-            }
-          }
-        }
-      }
-
-      // Segunda búsqueda (solo A y B de valores1)
-      if (resultados.length === 0) {
-        for (let a of valores1) {
-          for (let b of valores1) {
-            if (a !== b) {
-              const frac1 = { numerador: 30, denominador: Z };
-              const frac2 = { numerador: a, denominador: b };
-
-              if (fraccionIgual(frac1, frac2)) {
-                resultados.push({ a, b, c: null, d: null, tipo: "AB" });
               }
             }
           }
@@ -247,7 +247,7 @@
       const tbody = tabla.querySelector("tbody");
       tbody.innerHTML = "";
 
-      resultados.slice(0, 10).forEach(({ a, b, c, d, tipo }) => {
+      resultados.slice(0, 30).forEach(({ a, b, c, d, tipo }) => {
         const row = document.createElement("tr");
         row.innerHTML = `
                 <td>${Z}</td>
