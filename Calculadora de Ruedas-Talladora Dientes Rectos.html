@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    .highlight {
+            color: red;
+        }
+
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+    }
+
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    img {
+      display: block;
+      margin: 10px auto;
+      max-width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ddd;
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 5px;
+    }
+
+    #resultado-formula {
+      font-size: 20px;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .formula {
+      font-size: 25px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 10px;
+      }
+
+      form {
+        padding: 15px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1></h1>
+  <form id="formulario">
+    <label for="z">Z (número de dientes):</label>
+    <input type="number" id="z" name="z" required><br><br>
+
+    <label for="m">M (módulo):</label>
+    <input type="number" step="0.01" id="m" name="m" required><br><br>
+
+    <button type="submit">Calcular</button>
+  </form>
+
+  <h2>Resultados</h2>
+  <p id="altura" class="hidden"></p>
+  <table id="tabla-resultados" class="hidden">
+    <thead>
+      <tr>
+        <th>Nº dientes</th>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+        <th>D</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById("formulario").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const Z = parseInt(document.getElementById("z").value);
+      const M = parseFloat(document.getElementById("m").value);
+
+      const altura = 2.167 * M;
+      document.getElementById("altura").textContent = `Altura del diente: ${altura.toFixed(3)} mm`;
+      document.getElementById("altura").classList.remove("hidden");
+
+      const relacion = 30 / Z;
+      const valores1 = [24, 30, 36, 40, 48, 60, 61, 62, 67, 68, 71, 72, 73, 74, 77, 79, 80, 82, 83, 84, 86, 88, 89, 92, 94, 96, 97, 98, 107, 42, 76];
+      const valores2 = Array.from({ length: 102 }, (_, i) => 24 + i).filter(x => !valores1.includes(x));
+
+      let resultados = [];
+
+      function fraccionIgual(frac1, frac2) {
+        return frac1.numerador * frac2.denominador === frac1.denominador * frac2.numerador;
+      }
+
+      // Primera búsqueda (cuatro valores de valores1)
+      for (let a of valores1) {
+        for (let b of valores1) {
+          if (b === a) continue;
+          for (let c of valores1) {
+            if (c === a || c === b) continue;
+            for (let d of valores1) {
+              if (d === a || d === b || d === c) continue;
+              const especial = [42, 76];
+              if (especial.includes(a) || especial.includes(b) || especial.includes(c) || especial.includes(d)) {
+                if ([a, b, c, d].filter(x => x === 42).length > 2 || [a, b, c, d].filter(x => x === 76).length > 2) {
+                  continue;
+                }
+              }
+
+              const frac1 = { numerador: 30, denominador: Z };
+              const frac2 = { numerador: a * c, denominador: b * d };
+
+              if (fraccionIgual(frac1, frac2)) {
+                resultados.push({ a, b, c, d, tipo: "ABCD-1" });
+              }
+            }
+          }
+        }
+      }
+
+      // Segunda búsqueda (solo A y B de valores1)
+      if (resultados.length === 0) {
+        for (let a of valores1) {
+          for (let b of valores1) {
+            if (a !== b) {
+              const frac1 = { numerador: 30, denominador: Z };
+              const frac2 = { numerador: a, denominador: b };
+
+              if (fraccionIgual(frac1, frac2)) {
+                resultados.push({ a, b, c: null, d: null, tipo: "AB" });
+              }
+            }
+          }
+        }
+      }
+
+      // Tercera búsqueda (valores combinados de ambas listas)
+      if (resultados.length === 0) {
+        const todasLasCombinaciones = [...valores1, ...valores2];
+
+        for (let a of todasLasCombinaciones) {
+          for (let b of todasLasCombinaciones) {
+            if (b === a) continue;
+            for (let c of todasLasCombinaciones) {
+              if (c === a || c === b) continue;
+              for (let d of todasLasCombinaciones) {
+                if (d === a || d === b || d === c) continue;
+                const especial = [42, 76];
+                if (especial.includes(a) || especial.includes(b) || especial.includes(c) || especial.includes(d)) {
+                  if ([a, b, c, d].filter(x => x === 42).length > 2 || [a, b, c, d].filter(x => x === 76).length > 2) {
+                    continue;
+                  }
+                }
+
+                const frac1 = { numerador: 30, denominador: Z };
+                const frac2 = { numerador: a * c, denominador: b * d };
+
+                if (fraccionIgual(frac1, frac2)) {
+                  resultados.push({ a, b, c, d, tipo: "ABCD-2" });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const tabla = document.getElementById("tabla-resultados");
+      const tbody = tabla.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      resultados.slice(0, 10).forEach(({ a, b, c, d, tipo }) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+                <td>${Z}</td>
+                <td class="${valores2.includes(a) ? 'highlight' : ''}">${a}</td>
+                <td class="${valores2.includes(b) ? 'highlight' : ''}">${b}</td>
+                <td class="${c !== null && valores2.includes(c) ? 'highlight' : ''}">${c !== null ? c : ''}</td>
+                <td class="${d !== null && valores2.includes(d) ? 'highlight' : ''}">${d !== null ? d : ''}</td>
+            `;
+        tbody.appendChild(row);
+      });
+
+      if (resultados.length > 0) {
+        tabla.classList.remove("hidden");
+      } else {
+        alert("No se encontraron combinaciones que cumplan la relación.");
+        tabla.classList.add("hidden");
+      }
+    });
+  </script>
+</body>
+
+</html>
