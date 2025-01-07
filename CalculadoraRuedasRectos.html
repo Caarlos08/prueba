@@ -213,35 +213,45 @@
         }
       }
 
-      // Tercera búsqueda (valores combinados de ambas listas)
-      if (resultados.length === 0) {
-        const todasLasCombinaciones = [...valores1, ...valores2];
+     // Tercera búsqueda (valores combinados de ambas listas)
+if (resultados.length === 0) {
+  const todasLasCombinaciones = [...valores1, ...valores2];
 
-        for (let a of todasLasCombinaciones) {
-          for (let b of todasLasCombinaciones) {
-            if (b === a) continue;
-            for (let c of todasLasCombinaciones) {
-              if (c === a || c === b) continue;
-              for (let d of todasLasCombinaciones) {
-                if (d === a || d === b || d === c) continue;
-                const especial = [42, 76];
-                if (especial.includes(a) || especial.includes(b) || especial.includes(c) || especial.includes(d)) {
-                  if ([a, b, c, d].filter(x => x === 42).length > 2 || [a, b, c, d].filter(x => x === 76).length > 2) {
-                    continue;
-                  }
-                }
+  for (let a of todasLasCombinaciones) {
+    for (let b of todasLasCombinaciones) {
+      if (b === a) continue;
+      for (let c of todasLasCombinaciones) {
+        if (c === a || c === b) continue;
+        for (let d of todasLasCombinaciones) {
+          if (d === a || d === b || d === c) continue;
 
-                const frac1 = { numerador: 30, denominador: Z };
-                const frac2 = { numerador: a * c, denominador: b * d };
+          const especial = [42, 76];
+          if (especial.includes(a) || especial.includes(b) || especial.includes(c) || especial.includes(d)) {
+            if ([a, b, c, d].filter(x => x === 42).length > 2 || [a, b, c, d].filter(x => x === 76).length > 2) {
+              continue;
+            }
+          }
 
-                if (fraccionIgual(frac1, frac2)) {
-                  resultados.push({ a, b, c, d, tipo: "ABCD-2" });
-                }
-              }
+          const frac1 = { numerador: 30, denominador: Z };
+          const frac2 = { numerador: a * c, denominador: b * d };
+
+          if (fraccionIgual(frac1, frac2)) {
+            resultados.push({ a, b, c, d, tipo: "ABCD-2" });
+
+            // Salir del bucle si se encuentran 30 resultados
+            if (resultados.length >= 30) {
+              break;
             }
           }
         }
+        if (resultados.length >= 30) break;
       }
+      if (resultados.length >= 30) break;
+    }
+    if (resultados.length >= 30) break;
+  }
+}
+
 
       const tabla = document.getElementById("tabla-resultados");
       const tbody = tabla.querySelector("tbody");
