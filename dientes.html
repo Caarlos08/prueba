@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hallar Módulo Helicoidal - Talleres Torralvo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+    }
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .resultado-contenedor {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      padding: 20px;
+      background-color: #e8f5e9;
+      border-radius: 8px;
+      border: 1px solid #4CAF50;
+    }
+    #resultado-texto {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    .formula-display {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #666;
+      font-style: italic;
+    }
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin: 10px;
+      }
+      form {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hallar Módulo Helicoidal</h1>
+  <h2 style="color: rgb(5, 26, 189); text-align: center;">TALLERES TORRALVO</h2>
+
+  <form id="formulario-modulo">
+    <div class="formula-display">
+        Fórmula: $$M = \frac{D}{\frac{nº dientes}{\cos(\alpha)} + 2}$$
+    </div>
+
+    <label for="diametro">Diámetro Exterior (D):</label>
+    <input type="number" id="diametro" step="0.000001" placeholder="Ej: 120.5" required>
+
+    <label for="dientes">Número de dientes (n):</label>
+    <input type="number" id="dientes" step="1" placeholder="Ej: 30" required>
+
+    <label for="angulo_grados">Ángulo (α) en grados:</label>
+    <input type="number" id="angulo_grados" step="0.000001" placeholder="Ej: 15" required>
+
+    <button type="button" id="boton-calcular">Calcular Módulo</button>
+  </form>
+
+  <div id="resultado-seccion" class="resultado-contenedor hidden">
+    <p>El módulo resultante es:</p>
+    <span id="resultado-texto"></span>
+  </div>
+
+  <script>
+    document.getElementById('boton-calcular').addEventListener('click', () => {
+      const D = parseFloat(document.getElementById('diametro').value);
+      const n = parseFloat(document.getElementById('dientes').value);
+      const angulo = parseFloat(document.getElementById('angulo_grados').value);
+      
+      const resultadoSeccion = document.getElementById('resultado-seccion');
+      const resultadoTexto = document.getElementById('resultado-texto');
+
+      // Validación de entradas
+      if (isNaN(D) || isNaN(n) || isNaN(angulo)) {
+        alert('Por favor, rellena todos los campos con valores numéricos.');
+        return;
+      }
+
+      if (n <= 0) {
+        alert('El número de dientes debe ser mayor que cero.');
+        return;
+      }
+
+      // Convertir ángulo a radianes para Math.cos
+      const anguloRadianes = angulo * (Math.PI / 180);
+      const coseno = Math.cos(anguloRadianes);
+
+      // Aplicar fórmula: M = D / ((n / cos(angulo)) + 2)
+      const modulo = D / ((n / coseno) + 2);
+
+      // Mostrar resultado limitado a 4 decimales
+      resultadoTexto.textContent = "M = " + modulo.toFixed(4);
+      resultadoSeccion.classList.remove('hidden');
+    });
+  </script>
+
+</body>
+</html>
